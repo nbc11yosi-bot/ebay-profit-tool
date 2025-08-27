@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from mercari_scraper import extract_mercari_info
 from profit_logic import fetch_usd_to_jpy_rate, calculate_profit, suggest_min_usd_price
+import os
 
 app = Flask(__name__)
 
@@ -45,4 +46,5 @@ def index():
                            exchange_rate=exchange_rate)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
