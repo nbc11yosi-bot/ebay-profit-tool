@@ -1,0 +1,13 @@
+region,type,weight_min,weight_max,base_price,insurance_price
+USA,card,0,50,140,460
+USA,card,51,100,220,460
+USA,small_packet,0,100,830,510
+USA,small_packet,101,200,1040,510
+USA,small_packet,201,300,1250,510
+USA,small_packet,301,400,1460,510
+USA,small_packet,401,500,1670,510
+USA,small_packet,501,600,1880,510
+USA,small_packet,601,700,2090,510
+USA,small_packet,701,800,2300,510
+USA,small_packet,801,900,2510,510
+USA,small_packet,901,1000,2720,510
