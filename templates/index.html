@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>利益判定ツール（Web版）</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { padding: 30px; font-family: 'Meiryo', sans-serif; }
+        .card-img { max-width: 200px; }
+        textarea { resize: vertical; }
+    </style>
+</head>
+<body>
+    <h1 class="mb-4">📦 利益判定ツール（Web版）</h1>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="urls" class="form-label">メルカリ商品URL（複数可）</label>
+            <textarea name="urls" class="form-control" rows="3" placeholder="https://..."></textarea>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label class="form-label">メルカリ価格（円）</label>
+                <input type="number" name="cost_price" class="form-control" value="33000">
+            </div>
+            <div class="col">
+                <label class="form-label">eBay販売価格（USD）</label>
+                <input type="number" name="usd_price" class="form-control" value="270">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label class="form-label">商品タイプ</label>
+                <select name="item_type" class="form-select">
+                    <option value="card">カード</option>
+                    <option value="small_packet" selected>小型包装物</option>
+                </select>
+            </div>
+            <div class="col">
+                <label class="form-label">重量 (g)</label>
+                <input type="number" name="weight" class="form-control" value="750">
+            </div>
+            <div class="col d-flex align-items-end">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="insured" checked>
+                    <label class="form-check-label">保険あり</label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">商品情報取得 & 利益計算</button>
+    </form>
+
+    <hr>
+
+    {% if info_list %}
+        <h2 class="mt-4">📝 商品情報</h2>
+        {% for info in info_list %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ info.name }} <small class="text-muted">({{ info.translated_name }})</small></h5>
+                    <p class="card-text">価格: ¥{{ info.price }}<br>状態: {{ info.translated_condition }}<br>取得元: {{ info.price_source }}</p>
+                    {% if info.image_urls %}
+                        <img src="{{ info.image_urls[0] }}" class="card-img" alt="商品画像">
+                    {% endif %}
+                    <a href="{{ info.source_url }}" target="_blank" class="btn btn-outline-secondary mt-2">メルカリで見る</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if profit_result %}
+        <h2 class="mt-4">📈 利益計算結果</h2>
+        <ul class="list-group">
+            <li class="list-group-item">為替レート: 1 USD = ¥{{ exchange_rate }}</li>
+            <li class="list-group-item">eBay販売価格: ${{ profit_result.usd_price }} → ¥{{ profit_result.target_price }}</li>
+            <li class="list-group-item">送料: ¥{{ profit_result.shipping_cost }}</li>
+            <li class="list-group-item">eBay手数料 (20%): ¥{{ profit_result.ebay_fee }}</li>
+            <li class="list-group-item">総コスト: ¥{{ profit_result.total_cost }}</li>
+            <li class="list-group-item">利益: ¥{{ profit_result.profit }}</li>
+            <li class="list-group-item">利益率: {{ profit_result.profit_rate }}%</li>
+            <li class="list-group-item fw-bold text-{{ 'success' if profit_result.is_profitable else 'danger' }}">
+                出品可否: {{ '✅ 出品可能' if profit_result.is_profitable else '❌ 出品不可' }}
+            </li>
+        </ul>
+    {% endif %}
+
+    {% if error %}
+        <div class="alert alert-danger mt-4">{{ error }}</div>
+    {% endif %}
+</body>
+</html>
